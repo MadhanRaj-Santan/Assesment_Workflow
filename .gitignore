@@ -1,0 +1,16 @@
+# Environment and Python
+server/venv/
+server/__pycache__/
+*.pyc
+.env
+
+# Node and Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Local Uploads and Data
+server/uploads/
+
+# OS generated files
+.DS_Store
+Thumbs.db
