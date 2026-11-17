@@ -72,32 +72,52 @@ A customer fills out their details, provides a description, and attaches a file 
 
 FastAPI saves the attachment securely to the server/uploads/ directory and creates a database row in PostgreSQL with a initial status of PENDING.
 
-Workflow Initialization:
+Local Setup and Installation
 
-FastAPI generates a unique temporal_workflow_id and connects to the Temporal server to start the ApprovalWorkflow.
+1. Clone & Environment Setup
 
-Durable Pause (Human-in-the-Loop):
+Clone the repository and navigate into the project root.
 
-The workflow enters a suspended state (workflow.wait_condition), idling indefinitely without consuming CPU cycles while waiting for an external signal.
+2. Start Infrastructure (PostgreSQL & Temporal)
 
-Decision Phase:
+Run Docker Compose to spin up PostgreSQL, the Temporal Server, and the Temporal Web UI:
 
-The business owner reviews incoming requests on the Owner Dashboard.
+docker compose up -d
 
-Clicking Approve or Reject dispatches an asynchronous Signal (APPROVED or REJECTED) from FastAPI directly to the running Temporal workflow handle.
 
-Activity Execution & Resolution:
+Temporal Web UI is accessible at: http://localhost:8088
 
-Temporal unblocks the workflow and executes the update_request_status activity.
+PostgreSQL runs on port 5432.
 
-The activity mutates the database record.
+3. Start the Backend (FastAPI)
 
-The customer dashboard polls the backend every 5 seconds, instantly displaying the updated status pill (APPROVED or REJECTED).
+Navigate to the server directory, activate your virtual environment, install dependencies, and start Uvicorn:
 
-⚙️ Local Setup and Installation
-Prerequisites
-Python (v3.10+) installed.
+cd server
+python -m venv venv
+.\venv\Scripts\activate
+pip install fastapi uvicorn pydantic python-multipart temporalio sqlalchemy psycopg psycopg-binary
+python -m uvicorn app.main:app --reload
 
-Node.js & npm installed.
 
-Docker Desktop running.
+FastAPI Swagger Docs available at: http://localhost:8000/docs
+
+4. Start the Temporal Worker
+
+Open a second backend terminal tab, activate the virtual environment, and run the worker:
+
+cd server
+.\venv\Scripts\activate
+python -m app.temporal.worker
+
+
+5. Start the Frontend (React)
+
+Open a third terminal tab, navigate to the frontend folder, install dependencies, and start Vite:
+
+cd frontend
+npm install
+npm run dev
+
+
+Frontend application available at: http://localhost:5173
